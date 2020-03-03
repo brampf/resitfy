@@ -7,13 +7,17 @@ let package = Package(
     name: "Restify",
     platforms: [
         .macOS(.v10_15),
-        .iOS(.v13)
+        .tvOS(.v13),
+        .iOS(.v13),
     ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "Restify",
             targets: ["Restify"]),
+        .executable(
+            name: "DemoApp",
+            targets: ["DemoApp"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -25,6 +29,9 @@ let package = Package(
         .target(
             name: "Restify",
             dependencies: []),
+        .target(
+            name: "DemoApp",
+            dependencies: ["Restify"]),
         .testTarget(
             name: "RestifyTests",
             dependencies: ["Restify"]),

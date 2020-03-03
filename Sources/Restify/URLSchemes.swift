@@ -7,7 +7,7 @@
 
 import Foundation
 
-public  protocol URLScheme {
+public protocol URLScheme {
     
     var host : String {get}
     var port : Int? {get}
@@ -47,6 +47,13 @@ public struct HTTP : URLScheme {
     public let path: String?
     public let params: [URLParameter]?
     
+    public init(host: String, port: Int? = nil, path: String? = nil, params: [URLParameter]? = nil){
+        self.host = host
+        self.port = port
+        self.path = path
+        self.params = params
+    }
+    
     public var url : URL? {
         return assemble("http", host, port, path, params)
     }
@@ -58,6 +65,13 @@ public struct HTTPS : URLScheme {
     public let port: Int?
     public let path: String?
     public let params: [URLParameter]?
+    
+    public init(host: String, port: Int? = nil, path: String? = nil, params: [URLParameter]? = nil){
+        self.host = host
+        self.port = port
+        self.path = path
+        self.params = params
+    }
     
     public var url : URL? {
         return assemble("https", host, port, path, params)

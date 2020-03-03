@@ -10,6 +10,7 @@ final class RestifyTests: XCTestCase {
     
     func testURLGeneration() {
 
+        
         XCTAssertEqual(HTTP(host: "brampf.de", port: nil, path: nil, params: nil).url?.absoluteString, "http://brampf.de")
         XCTAssertEqual(HTTP(host: "brampf.de", port: 8080, path: nil, params: nil).url?.absoluteString, "http://brampf.de:8080")
         XCTAssertEqual(HTTPS(host: "brampf.de", port: nil, path: nil, params: nil).url?.absoluteString, "https://brampf.de")
@@ -32,7 +33,6 @@ final class RestifyTests: XCTestCase {
     }
     
     func testHTTPMethodGeneration() {
-        
         
         GET(url: HTTP(host: "localhost", port: 8080, path: nil, params: nil), headers: [.contentType("application/json")], expectedStatus: [.OK])
         
