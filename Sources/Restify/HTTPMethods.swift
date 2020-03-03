@@ -9,9 +9,9 @@ import Foundation
 
 
 public struct GET : HTTPRequest {
-    let url : URLScheme
-    let headers : [HTTPHeader]?
-    let expectedStatus: [HTTPStatus]
+    public let url : URLScheme
+    public let headers : [HTTPHeader]?
+    public let expectedStatus: [HTTPStatus]
     
     var request : URLRequest? {
         if let url = url.url {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol URLScheme {
+public  protocol URLScheme {
     
     var host : String {get}
     var port : Int? {get}
@@ -40,31 +40,31 @@ extension URLScheme {
     }
 }
 
-struct HTTP : URLScheme {
+public struct HTTP : URLScheme {
     
-    let host: String
-    let port: Int?
-    let path: String?
-    let params: [URLParameter]?
+    public let host: String
+    public let port: Int?
+    public let path: String?
+    public let params: [URLParameter]?
     
-    var url : URL? {
+    public var url : URL? {
         return assemble("http", host, port, path, params)
     }
 }
 
-struct HTTPS : URLScheme {
+public struct HTTPS : URLScheme {
     
-    let host: String
-    let port: Int?
-    let path: String?
-    let params: [URLParameter]?
+    public let host: String
+    public let port: Int?
+    public let path: String?
+    public let params: [URLParameter]?
     
-    var url : URL? {
+    public var url : URL? {
         return assemble("https", host, port, path, params)
     }
 }
 
-enum URLParameter {
+public enum URLParameter {
     
     case parameter(String,String)
     
