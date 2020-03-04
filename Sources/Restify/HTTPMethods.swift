@@ -27,7 +27,7 @@ public struct GET : HTTPRequest {
         }
     }
     
-    func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
             return execute(request: request, expectedStatusCodes: codes, callback: completion)
@@ -59,7 +59,7 @@ public struct POST<Body: Encodable> : HTTPRequest {
         }
     }
     
-    func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
         if var request = self.request {
             request.httpBody = try? JSONEncoder().encode(body)
             let codes = expectedStatus.map{$0.code}
@@ -91,7 +91,7 @@ public struct PUT<Body : Encodable> : HTTPRequest {
         }
     }
     
-    func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
         if var request = self.request {
             request.httpBody = try? JSONEncoder().encode(body)
             let codes = expectedStatus.map{$0.code}
@@ -121,7 +121,7 @@ public struct DELETE<Body : Encodable> : HTTPRequest {
         }
     }
     
-    func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
             return executeEmpty(request: request, expectedStatusCodes: codes, callback: completion)
