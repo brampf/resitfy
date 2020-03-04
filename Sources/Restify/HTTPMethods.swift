@@ -73,14 +73,16 @@ public struct PUT<Body : Encodable> : HTTPRequestBody {
     }
 }
 
-public struct DELETE<Body : Encodable> : HTTPRequest {
+public struct DELETE<Body : Encodable> : HTTPRequestBody {
     public let url : URLScheme
     public let headers : [HTTPHeader]?
+    public let body : Body
     public let expectedStatus: [HTTPStatus]
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, expectedStatus: [HTTPStatus]){
+    public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
         self.url = url
         self.headers = headers
+        self.body = body
         self.expectedStatus = expectedStatus
     }
     
