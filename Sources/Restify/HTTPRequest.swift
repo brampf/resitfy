@@ -16,9 +16,58 @@ protocol HTTPRequest {
     
     var request : URLRequest? { get }
     func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void)
+    func send(completion: @escaping (Error?) -> Void)
+}
+
+protocol HTTPRequestBody : HTTPRequest {
+    associatedtype Body : Encodable
+
+    var body : Body { get }
+}
+
+extension HTTPRequestBody {
+    
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+        if var request = self.request {
+            request.httpBody = try? JSONEncoder().encode(body)
+            let codes = expectedStatus.map{$0.code}
+            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+        } else {
+            completion(nil,HTTPError.invalidURL)
+        }
+    }
+    
+    public func send(completion: @escaping (Error?) -> Void) {
+        if var request = self.request {
+            request.httpBody = try? JSONEncoder().encode(body)
+            let codes = expectedStatus.map{$0.code}
+            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+        } else {
+            completion(HTTPError.invalidURL)
+        }
+    }
+    
 }
 
 extension HTTPRequest {
+    
+    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+        if let request = self.request {
+            let codes = expectedStatus.map{$0.code}
+            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+        } else {
+            completion(nil,HTTPError.invalidURL)
+        }
+    }
+    
+    public func send(completion: @escaping (Error?) -> Void) {
+        if let request = self.request {
+            let codes = expectedStatus.map{$0.code}
+            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+        } else {
+            completion(HTTPError.invalidURL)
+        }
+    }
     
     func execute<OUT: Decodable>(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (OUT?,Error?) -> Void){
         
@@ -45,7 +94,7 @@ extension HTTPRequest {
         })
     }
     
-    func executeEmpty<OUT: Any>(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (OUT?,Error?) -> Void){
+    func execute(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (Error?) -> Void){
         
         URLSession.shared.dataTaskPublisher(for: request)
             .tryMap{ output -> Data in
@@ -63,10 +112,10 @@ extension HTTPRequest {
         .receive(subscriber: Subscribers.Sink(receiveCompletion: { completion in
             switch completion {
             case .finished: break // allright
-            case .failure(let error): callback(nil,error)
+            case .failure(let error): callback(error)
             }
         }) { output in
-            callback(nil,nil)
+            callback(nil)
         })
     }
 }
