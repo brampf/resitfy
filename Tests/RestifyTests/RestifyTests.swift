@@ -36,6 +36,11 @@ final class RestifyTests: XCTestCase {
         
         GET(url: HTTP(host: "localhost", port: 8080, path: nil, params: nil), headers: [.contentType("application/json")], expectedStatus: [.OK])
         
+        let base = HTTP(host: "domain.tld")
+        _ = base⁄"version"
+        _ = base⁄[.parameter("test", "best")]
+        _ = base⁄"version"⁄"test"
+        
     }
 
 }

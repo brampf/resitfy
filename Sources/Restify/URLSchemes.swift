@@ -15,7 +15,17 @@ public protocol URLScheme {
     var params : [URLParameter]? {get}
     
     var url : URL? {get}
+    
+    //static func &(me: Self, path: String) -> Self
+    //static func /(me: Self, params: [URLParameter]) -> Self
 }
+
+precedencegroup SchemePrecedence {
+    associativity: left
+    higherThan: MultiplicationPrecedence
+}
+
+infix operator ⁄ : SchemePrecedence
 
 extension URLScheme {
     
@@ -36,8 +46,8 @@ extension URLScheme {
         }
         
         return component.url
-        
     }
+
 }
 
 public struct HTTP : URLScheme {
@@ -52,6 +62,14 @@ public struct HTTP : URLScheme {
         self.port = port
         self.path = path
         self.params = params
+    }
+
+    public static func ⁄(me: Self, path: String) -> Self {
+        return Self(host: me.host, port: me.port, path: path, params: me.params)
+    }
+    
+    public static func ⁄(me: Self, params: [URLParameter]) -> Self {
+        return Self(host: me.host, port: me.port, path: me.path, params: params)
     }
     
     public var url : URL? {
@@ -71,6 +89,14 @@ public struct HTTPS : URLScheme {
         self.port = port
         self.path = path
         self.params = params
+    }
+    
+    public static func ⁄(me: Self, path: String) -> Self {
+        return Self(host: me.host, port: me.port, path: path, params: me.params)
+    }
+   
+    public static func ⁄(me: Self, params: [URLParameter]) -> Self {
+        return Self(host: me.host, port: me.port, path: me.path, params: params)
     }
     
     public var url : URL? {
