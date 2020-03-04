@@ -19,7 +19,7 @@ public struct GET : HTTPRequest {
         self.expectedStatus = expectedStatus
     }
     
-    var request : URLRequest? {
+    public var request : URLRequest? {
         if let url = url.url {
             return URLRequest(url: url)
         } else {
@@ -30,10 +30,10 @@ public struct GET : HTTPRequest {
 
 public struct POST<Body: Encodable> : HTTPRequestBody {
   
-    let url : URLScheme
-    let headers : [HTTPHeader]?
-    let body : Body
-    let expectedStatus: [HTTPStatus]
+    public let url : URLScheme
+    public let headers : [HTTPHeader]?
+    public let body : Body
+    public let expectedStatus: [HTTPStatus]
     
     public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
         self.url = url
@@ -42,7 +42,7 @@ public struct POST<Body: Encodable> : HTTPRequestBody {
         self.expectedStatus = expectedStatus
     }
     
-    var request : URLRequest? {
+    public var request : URLRequest? {
         if let url = url.url {
             return URLRequest(url: url)
         } else {
@@ -52,10 +52,10 @@ public struct POST<Body: Encodable> : HTTPRequestBody {
 }
 
 public struct PUT<Body : Encodable> : HTTPRequestBody {
-    let url : URLScheme
-    let headers : [HTTPHeader]?
-    let body : Body
-    let expectedStatus: [HTTPStatus]
+    public let url : URLScheme
+    public let headers : [HTTPHeader]?
+    public let body : Body
+    public let expectedStatus: [HTTPStatus]
     
     public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
         self.url = url
@@ -64,7 +64,7 @@ public struct PUT<Body : Encodable> : HTTPRequestBody {
         self.expectedStatus = expectedStatus
     }
     
-    var request : URLRequest? {
+    public var request : URLRequest? {
         if let url = url.url {
             return URLRequest(url: url)
         } else {
@@ -74,9 +74,9 @@ public struct PUT<Body : Encodable> : HTTPRequestBody {
 }
 
 public struct DELETE<Body : Encodable> : HTTPRequest {
-    let url : URLScheme
-    let headers : [HTTPHeader]?
-    let expectedStatus: [HTTPStatus]
+    public let url : URLScheme
+    public let headers : [HTTPHeader]?
+    public let expectedStatus: [HTTPStatus]
     
     public init(url: URLScheme, headers: [HTTPHeader]? = nil, expectedStatus: [HTTPStatus]){
         self.url = url
@@ -84,7 +84,7 @@ public struct DELETE<Body : Encodable> : HTTPRequest {
         self.expectedStatus = expectedStatus
     }
     
-    var request : URLRequest? {
+    public var request : URLRequest? {
         if let url = url.url {
             return URLRequest(url: url)
         } else {

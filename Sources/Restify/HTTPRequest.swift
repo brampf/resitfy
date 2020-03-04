@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol HTTPRequest {
+public protocol HTTPRequest {
     
     var url : URLScheme { get }
     var headers : [HTTPHeader]? { get }
@@ -19,7 +19,7 @@ protocol HTTPRequest {
     func send(completion: @escaping (Error?) -> Void)
 }
 
-protocol HTTPRequestBody : HTTPRequest {
+public protocol HTTPRequestBody : HTTPRequest {
     associatedtype Body : Encodable
 
     var body : Body { get }
