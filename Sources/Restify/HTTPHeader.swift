@@ -11,8 +11,10 @@ import Foundation
 /// with a little help from https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
 public enum HTTPHeader {
     
-    case accept(String)
-    case contentType(String)
+    //request headers
+    case Accept(String)
+    case Authorization(String)
+    case ContentType(String)
     case ContentLength(String)
     case ContentMD5(String)
     case ContentEncoding(String)
@@ -25,13 +27,15 @@ public enum HTTPHeader {
     case PublicKeyPins(String)
     case WWWAuthenticate(String)
     case Via(String)
+    
     // Custom header
     case header(String,String)
     
     var pair : (String,String) {
         switch self {
-        case .accept(let value): return ("Accept",value)
-        case .contentType(let value): return ("Content-Type",value)
+        case .Accept(let value): return ("Accept",value)
+        case .Authorization(let value): return("Authorization",value)
+        case .ContentType(let value): return ("Content-Type",value)
         case .ContentLength(let value): return ("Content-Length",value)
         case .ContentMD5(let value): return ("Content-MD5",value)
         case .ContentEncoding(let value): return ("Content-Encoding",value)

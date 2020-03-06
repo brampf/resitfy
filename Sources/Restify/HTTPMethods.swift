@@ -9,6 +9,7 @@ import Foundation
 
 
 public struct GET : HTTPRequest {
+
     public let url : URLScheme
     public let headers : [HTTPHeader]?
     public let expectedStatus: [HTTPStatus]
@@ -17,14 +18,6 @@ public struct GET : HTTPRequest {
         self.url = url
         self.headers = headers
         self.expectedStatus = expectedStatus
-    }
-    
-    public var request : URLRequest? {
-        if let url = url.url {
-            return URLRequest(url: url)
-        } else {
-            return nil
-        }
     }
 }
 
@@ -41,14 +34,6 @@ public struct POST<Body: Encodable> : HTTPRequestBody {
         self.body = body
         self.expectedStatus = expectedStatus
     }
-    
-    public var request : URLRequest? {
-        if let url = url.url {
-            return URLRequest(url: url)
-        } else {
-            return nil
-        }
-    }
 }
 
 public struct PUT<Body : Encodable> : HTTPRequestBody {
@@ -63,14 +48,6 @@ public struct PUT<Body : Encodable> : HTTPRequestBody {
         self.body = body
         self.expectedStatus = expectedStatus
     }
-    
-    public var request : URLRequest? {
-        if let url = url.url {
-            return URLRequest(url: url)
-        } else {
-            return nil
-        }
-    }
 }
 
 public struct DELETE<Body : Encodable> : HTTPRequestBody {
@@ -84,14 +61,6 @@ public struct DELETE<Body : Encodable> : HTTPRequestBody {
         self.headers = headers
         self.body = body
         self.expectedStatus = expectedStatus
-    }
-    
-    public var request : URLRequest? {
-        if let url = url.url {
-            return URLRequest(url: url)
-        } else {
-            return nil
-        }
     }
 }
 

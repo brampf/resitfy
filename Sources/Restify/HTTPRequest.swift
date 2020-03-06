@@ -14,7 +14,6 @@ public protocol HTTPRequest {
     var headers : [HTTPHeader]? { get }
     var expectedStatus : [HTTPStatus] { get }
     
-    var request : URLRequest? { get }
     func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void)
     func send(completion: @escaping (Error?) -> Void)
 }
@@ -27,45 +26,53 @@ public protocol HTTPRequestBody : HTTPRequest {
 
 extension HTTPRequestBody {
     
-    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
-        if var request = self.request {
-            request.httpBody = try? JSONEncoder().encode(body)
-            let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
-        } else {
-            completion(nil,HTTPError.invalidURL)
+    var request: URLRequest? {
+        
+        guard let url = self.url.url else  {
+            return nil
         }
-    }
-    
-    public func send(completion: @escaping (Error?) -> Void) {
-        if var request = self.request {
-            request.httpBody = try? JSONEncoder().encode(body)
-            let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
-        } else {
-            completion(HTTPError.invalidURL)
+        var request = URLRequest(url: url)
+        request.httpBody = try? JSONEncoder().encode(body)
+        if let modifier = Restify.requestModifier {
+            modifier(&request)
         }
+        return request
     }
     
 }
 
 extension HTTPRequest {
+
+     var request: URLRequest? {
+        
+        guard let url = self.url.url else  {
+            return nil
+        }
+        var request = URLRequest(url: url)
+        if let modifier = Restify.requestModifier {
+            modifier(&request)
+        }
+        return request
+    }
+    
     
     public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
             return execute(request: request, expectedStatusCodes: codes, callback: completion)
         } else {
-            completion(nil,HTTPError.invalidURL)
+            return completion(nil,HTTPError.invalidURL)
         }
     }
     
     public func send(completion: @escaping (Error?) -> Void) {
+        
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
             return execute(request: request, expectedStatusCodes: codes, callback: completion)
         } else {
-            completion(HTTPError.invalidURL)
+            return completion(HTTPError.invalidURL)
         }
     }
     

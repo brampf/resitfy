@@ -5,8 +5,18 @@ final class RestifyTests: XCTestCase {
 
     static var allTests = [
         ("URL Generator", testURLGeneration),
+        ("URL Operator", testURLOperator),
         ("HTTP Method Generator", testHTTPMethodGeneration),
     ]
+    
+    func testURLOperator() {
+        
+        let base = HTTP(host: "domain.tld")
+        XCTAssertEqual((base⁄"/version").url?.absoluteString, "http://domain.tld/version")
+        XCTAssertEqual((base⁄"/version"⁄"/test").url?.absoluteString, "http://domain.tld/version/test")
+        XCTAssertEqual((base⁄[.parameter("test", "best")]).url?.absoluteString, "http://domain.tld?test=best")
+        
+    }
     
     func testURLGeneration() {
 
@@ -34,12 +44,9 @@ final class RestifyTests: XCTestCase {
     
     func testHTTPMethodGeneration() {
         
-        GET(url: HTTP(host: "localhost", port: 8080, path: nil, params: nil), headers: [.contentType("application/json")], expectedStatus: [.OK])
+        let get = GET(url: HTTP(host: "localhost", port: 8080, path: nil, params: nil), headers: [.ContentType("application/json")], expectedStatus: [.OK])
         
-        let base = HTTP(host: "domain.tld")
-        _ = base⁄"version"
-        _ = base⁄[.parameter("test", "best")]
-        _ = base⁄"version"⁄"test"
+
         
     }
 
