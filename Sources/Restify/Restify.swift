@@ -10,4 +10,6 @@ import Foundation
 public struct Restify {
     
     public static var requestModifier : ((_ request: inout URLRequest) -> Void)?
+    
+    public static var sessionDelegeate : URLSessionDelegate?
 }
