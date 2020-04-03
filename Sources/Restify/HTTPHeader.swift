@@ -52,3 +52,17 @@ public enum HTTPHeader {
         }
     }
 }
+
+extension URLRequest {
+    
+    mutating func set(header: HTTPHeader) {
+        self.setValue(header.pair.0, forHTTPHeaderField: header.pair.1)
+    }
+    
+    mutating func set(header: [HTTPHeader]?) {
+        header?.forEach{ header in
+            self.set(header: header)
+        }
+    }
+    
+}

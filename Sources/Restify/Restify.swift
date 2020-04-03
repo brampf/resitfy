@@ -7,7 +7,10 @@
 
 import Foundation
 
+public typealias CodableCustomStringConvertible = Codable & CustomStringConvertible
+
 public struct Restify {
     
     public static var requestModifier : ((_ request: inout URLRequest) -> Void)?
+    public static var errorDecoder : ((Data) -> CodableCustomStringConvertible?)?
 }

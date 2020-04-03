@@ -1,4 +1,4 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -16,8 +16,8 @@ let package = Package(
             name: "Restify",
             targets: ["Restify"]),
         .executable(
-            name: "DemoApp",
-            targets: ["DemoApp"]),
+            name: "DemoClient",
+            targets: ["DemoClient"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -30,7 +30,7 @@ let package = Package(
             name: "Restify",
             dependencies: []),
         .target(
-            name: "DemoApp",
+            name: "DemoClient",
             dependencies: ["Restify"]),
         .testTarget(
             name: "RestifyTests",

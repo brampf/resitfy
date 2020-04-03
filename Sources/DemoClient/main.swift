@@ -10,5 +10,4 @@ import Restify
 
 class Demo {
 
-    x = HTTP(host: "domain.tld")
 }

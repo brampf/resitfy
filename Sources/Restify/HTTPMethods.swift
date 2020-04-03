@@ -11,6 +11,7 @@ import Foundation
 public struct GET : HTTPRequest {
 
     public let url : URLScheme
+    public let method : String = "GET"
     public let headers : [HTTPHeader]?
     public let expectedStatus: [HTTPStatus]
     
@@ -24,6 +25,7 @@ public struct GET : HTTPRequest {
 public struct POST<Body: Encodable> : HTTPRequestBody {
   
     public let url : URLScheme
+    public let method : String = "POST"
     public let headers : [HTTPHeader]?
     public let body : Body
     public let expectedStatus: [HTTPStatus]
@@ -38,6 +40,7 @@ public struct POST<Body: Encodable> : HTTPRequestBody {
 
 public struct PUT<Body : Encodable> : HTTPRequestBody {
     public let url : URLScheme
+    public let method : String = "PUT"
     public let headers : [HTTPHeader]?
     public let body : Body
     public let expectedStatus: [HTTPStatus]
@@ -50,16 +53,15 @@ public struct PUT<Body : Encodable> : HTTPRequestBody {
     }
 }
 
-public struct DELETE<Body : Encodable> : HTTPRequestBody {
+public struct DELETE : HTTPRequest {
     public let url : URLScheme
+    public let method: String = "DELETE"
     public let headers : [HTTPHeader]?
-    public let body : Body
     public let expectedStatus: [HTTPStatus]
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
+    public init(url: URLScheme, headers: [HTTPHeader]? = nil, expectedStatus: [HTTPStatus]){
         self.url = url
         self.headers = headers
-        self.body = body
         self.expectedStatus = expectedStatus
     }
 }
