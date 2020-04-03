@@ -94,6 +94,16 @@ extension HTTPRequestBody {
 
 extension HTTPRequest {
 
+    var session : URLSession {
+        
+        if Restify.sessionDelegeate != nil {
+            return URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: Restify.sessionDelegeate!, delegateQueue: nil)
+        } else {
+            return URLSession.shared
+        }
+        
+    }
+    
      var request: URLRequest? {
         
         guard let url = self.url.url else  {
@@ -162,7 +172,7 @@ extension HTTPRequest {
     
     func execute<OUT: Decodable>(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (OUT?,Error?) -> Void){
         
-        URLSession.shared.dataTaskPublisher(for: request)
+        session.dataTaskPublisher(for: request)
             .tryMap{ output in
                 guard let response = output.response as? HTTPURLResponse else {
                     throw HTTPError.invalidFormat
@@ -194,7 +204,7 @@ extension HTTPRequest {
     
     func execute(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (Error?) -> Void){
         
-        URLSession.shared.dataTaskPublisher(for: request)
+        session.dataTaskPublisher(for: request)
             .tryMap{ output -> Data in
                 
                 guard let response = output.response as? HTTPURLResponse else {
