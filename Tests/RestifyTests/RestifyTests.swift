@@ -1,5 +1,6 @@
 import XCTest
 @testable import Restify
+import CryptoKit
 
 final class RestifyTests: XCTestCase {
 

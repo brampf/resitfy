@@ -10,4 +10,10 @@ import Restify
 
 class Demo {
 
+    func someThink() {
+        
+        
+    }
+    
+    
 }
