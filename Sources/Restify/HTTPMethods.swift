@@ -24,62 +24,51 @@
 
 import Foundation
 
-public struct GET : HTTPRequest {
 
-    public let url : URLScheme
-    public let method : String = "GET"
-    public let headers : [HTTPHeader]?
-    public let expectedStatus: [HTTPStatus]
+public protocol HTTPScheme : URLScheme {
+
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, expectedStatus: [HTTPStatus]){
-        self.url = url
-        self.headers = headers
-        self.expectedStatus = expectedStatus
-    }
+
 }
 
-public struct POST<Body: Encodable> : HTTPRequestBody {
-  
-    public let url : URLScheme
-    public let method : String = "POST"
-    public let headers : [HTTPHeader]?
-    public let body : Body
-    public let expectedStatus: [HTTPStatus]
+extension HTTPScheme {
+
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
-        self.url = url
-        self.headers = headers
-        self.body = body
-        self.expectedStatus = expectedStatus
+    public static func ⁄(me: Self, path: String) -> Self {
+        return Self(host: me.host, port: me.port, path: path)
     }
-}
-
-public struct PUT<Body : Encodable> : HTTPRequestBody {
-    public let url : URLScheme
-    public let method : String = "PUT"
-    public let headers : [HTTPHeader]?
-    public let body : Body
-    public let expectedStatus: [HTTPStatus]
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, body: Body, expectedStatus: [HTTPStatus]){
-        self.url = url
-        self.headers = headers
-        self.body = body
-        self.expectedStatus = expectedStatus
+    public static func ⁄(me: Self, params: [URLParameter]) -> Self {
+        return Self(host: me.host, port: me.port, path: me.path)
     }
-}
-
-public struct DELETE : HTTPRequest {
-    public let url : URLScheme
-    public let method: String = "DELETE"
-    public let headers : [HTTPHeader]?
-    public let expectedStatus: [HTTPStatus]
     
-    public init(url: URLScheme, headers: [HTTPHeader]? = nil, expectedStatus: [HTTPStatus]){
-        self.url = url
-        self.headers = headers
-        self.expectedStatus = expectedStatus
+    public typealias GET = HTTPRequest<EmptyBody>
+    public typealias POST = HTTPRequest
+    public typealias PUT = HTTPRequest
+    public typealias DELETE = HTTPRequest<EmptyBody>
+    
+    public func GET(_ endpoint: String) -> Self.GET{
+        return Self.GET(url: self⁄endpoint, method: "GET")
     }
+    
+    public func POST<Body : Encodable>(_ endpoint: String) -> Self.POST<Body>{
+        return Self.POST(url: self⁄endpoint, method: "POST")
+    }
+    
+    public func POST(_ endpoint: String) -> Self.POST<EmptyBody>{
+        return Self.POST(url: self⁄endpoint, method: "POST")
+    }
+    
+    public func PUT<Body : Encodable>(_ endpoint: String) -> Self.PUT<Body>{
+        return Self.PUT(url: self⁄endpoint, method: "PUT")
+    }
+    
+    public func PUT(_ endpoint: String) -> Self.PUT<EmptyBody>{
+        return Self.PUT(url: self⁄endpoint, method: "PUT")
+    }
+    
+    public func DELTE(_ endpoint: String) -> Self.GET{
+        return Self.DELETE(url: self⁄endpoint, method: "DELTE")
+    }
+
 }
-
-

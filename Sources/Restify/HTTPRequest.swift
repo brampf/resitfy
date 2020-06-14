@@ -25,68 +25,70 @@
 import Foundation
 import Combine
 
-public protocol HTTPRequest {
+public struct EmptyBody : Codable {
     
-    var url : URLScheme { get }
-    var method : String {get}
-    var headers : [HTTPHeader]? { get }
-    var expectedStatus : [HTTPStatus] { get }
-    
-    func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void)
-    func send(completion: @escaping (Error?) -> Void)
 }
 
-public protocol HTTPRequestBody : HTTPRequest {
-    associatedtype Body : Encodable
-
-    var body : Body { get }
-}
-
-extension HTTPRequestBody {
+public class HTTPRequest<Body: Encodable> {
     
-    var request: URLRequest? {
-        
-        guard let url = self.url.url else  {
-            return nil
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = self.method
-        request.set(header: self.headers)
-        request.httpBody = try? JSONEncoder().encode(body)
-        if let modifier = Restify.requestModifier {
-            modifier(&request)
-        }
-        return request
+    public let url : URLScheme
+    public let method : String
+    public private(set) var body : Body? = nil
+    public private(set) var headers : [HTTPHeader]? = nil
+    public private(set) var params: [URLParameter]? = nil
+    
+    public private(set) var expectedStatus: [HTTPStatus] = [.OK]
+    
+    init(url: URLScheme, method: String){
+        self.url = url
+        self.method = method
     }
     
-    public func debug() {
-        
-        print("ME: \(type(of: self))")
-        print(self)
-        print(self.request?.debugDescription ?? "--")
-        print(self.request?.httpBody ?? "--")
-        
+    public func header(_ headers: HTTPHeader...) -> Self {
+        self.headers = headers
+        return self
     }
     
-    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
+    public func query(_ parameters: URLParameter...) -> Self {
+        self.params = parameters
+        return self
+    }
+    
+    public func body(_ body: Body) -> Self{
+        self.body = body
+        return self
+    }
+
+    public func send<Out: Decodable>(_ codes: HTTPStatus..., onError: ((Error) -> Void)? = nil, onCompletion: @escaping (Out) -> Void) {
+        
+        if let log = Restify.log{
+            log.debug("\(self.debug())")
+        }
         
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+            execute(request: request, expectedStatusCodes: codes, onError: onError, onCompletion: onCompletion)
         } else {
-            return completion(nil,HTTPError.invalidURL)
+            onError?(HTTPError.invalidURL)
         }
     }
     
-    public func send(completion: @escaping (Error?) -> Void) {
+    public func send(_ codes: HTTPStatus..., onError: ((Error) -> Void)? = nil, onCompletion: @escaping () -> Void) {
+        
+        if let log = Restify.log{
+            log.debug("\(self.debug())")
+        }
         
         if let request = self.request {
             let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
+            execute(request: request, expectedStatusCodes: codes, onError: onError, onCompletion: onCompletion)
         } else {
-            return completion(HTTPError.invalidURL)
+            onError?(HTTPError.invalidURL)
         }
     }
+}
+
+extension HTTPRequest {
     
     public func upload(file: URL, completion: @escaping (Error?) -> Void) {
         
@@ -121,79 +123,51 @@ extension HTTPRequest {
         
     }
     
-     var request: URLRequest? {
+    var request: URLRequest? {
         
-        guard let url = self.url.url else  {
+        var component = URLComponents()
+        component.scheme = self.url.scheme
+        component.host = self.url.host
+        if let port = self.url.port {
+            component.port = port
+        }
+        if let path = self.url.path {
+            component.path = path
+        }
+        if let params = params {
+            component.queryItems = params.map{$0.query}
+        }
+        
+        guard let url = component.url else  {
             return nil
         }
+        
         var request = URLRequest(url: url)
         request.httpMethod = self.method
+        request.set(header: self.headers)
+        if let body = body {
+            request.httpBody = try? JSONEncoder().encode(body)
+        }
+
         if let modifier = Restify.requestModifier {
             modifier(&request)
         }
         return request
     }
+
     
-    public func debug() {
-        
-        print("ME: \(type(of: self))")
-        print(self)
-        print(self.request?.debugDescription ?? "--")
-        print(self.request?.httpBody ?? "--")
-        
-    }
-    
-    public func send<OUT: Decodable>(completion: @escaping (OUT?,Error?) -> Void) {
-        
-        if let request = self.request {
-            let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
-        } else {
-            return completion(nil,HTTPError.invalidURL)
-        }
-    }
-    
-    public func send(completion: @escaping (Error?) -> Void) {
-        
-        if let request = self.request {
-            let codes = expectedStatus.map{$0.code}
-            return execute(request: request, expectedStatusCodes: codes, callback: completion)
-        } else {
-            return completion(HTTPError.invalidURL)
-        }
-    }
-    
-    public func upload(file: URL, completion: @escaping (Error?) -> Void) {
-        
-        if let request = self.request {
-            let codes = expectedStatus.map{$0.code}
-            return upload(request: request, file: file, expectedStatusCodes: codes, callback: completion)
-        } else {
-            return completion(HTTPError.invalidURL)
-        }
-    }
-    
-    public func download(completion: @escaping (URL?,Error?) -> Void) {
-        
-        if let request = self.request {
-            let codes = expectedStatus.map{$0.code}
-            return download(request: request, expectedStatusCodes: codes, callback: completion)
-        } else {
-            return completion(nil,HTTPError.invalidURL)
-        }
-    }
-    
-    func what<T: Codable>(x : T) -> T.Type {
-        return type(of: x)
-    }
-    
-    func execute<OUT: Decodable>(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (OUT?,Error?) -> Void){
+    func execute<OUT: Decodable>(request: URLRequest, expectedStatusCodes: [Int], onError: ((Error) -> Void)? = nil, onCompletion: @escaping (OUT) -> Void){
         
         session.dataTaskPublisher(for: request)
             .tryMap{ output in
                 guard let response = output.response as? HTTPURLResponse else {
                     throw HTTPError.invalidFormat
                 }
+                
+                if Restify.log != nil, let raw = String(data: output.data, encoding: .utf8) {
+                    Restify.log?.debug("\(raw)")
+                }
+                
                 if !expectedStatusCodes.contains(response.statusCode) {
                     
                     if let dec = Restify.errorDecoder, let err = dec(output.data) {
@@ -212,14 +186,14 @@ extension HTTPRequest {
         .receive(subscriber: Subscribers.Sink(receiveCompletion: { completion in
             switch completion {
             case .finished: break // allright
-            case .failure(let error): callback(nil,error)
+            case .failure(let error): onError?(error)
             }
         }) { output in
-            callback(output,nil)
+            onCompletion(output)
         })
     }
     
-    func execute(request: URLRequest, expectedStatusCodes: [Int], callback: @escaping (Error?) -> Void){
+    func execute(request: URLRequest, expectedStatusCodes: [Int], onError: ((Error) -> Void)? = nil, onCompletion: @escaping () -> Void){
         
         session.dataTaskPublisher(for: request)
             .tryMap{ output -> Data in
@@ -227,6 +201,11 @@ extension HTTPRequest {
                 guard let response = output.response as? HTTPURLResponse else {
                     throw HTTPError.invalidFormat
                 }
+                
+                if Restify.log != nil, let raw = String(data: output.data, encoding: .utf8) {
+                    Restify.log?.debug("\(raw)")
+                }
+                
                 if !expectedStatusCodes.contains(response.statusCode) {
                     
                     if let dec = Restify.errorDecoder, let err = dec(output.data) {
@@ -245,10 +224,10 @@ extension HTTPRequest {
         .receive(subscriber: Subscribers.Sink(receiveCompletion: { completion in
             switch completion {
             case .finished: break // allright
-            case .failure(let error): callback(error)
+            case .failure(let error): onError?(error)
             }
         }) { output in
-            callback(nil)
+            onCompletion()
         })
     }
     
@@ -316,4 +295,20 @@ extension HTTPRequest {
         })
     }
     
+}
+
+extension HTTPRequest {
+    
+    public func debug() {
+        
+        print("ME: \(type(of: self))")
+        print(self)
+        print(self.request?.debugDescription ?? "--")
+        print(self.request?.httpBody ?? "--")
+        
+    }
+    
+    func what<T: Codable>(x : T) -> T.Type {
+        return type(of: x)
+    }
 }

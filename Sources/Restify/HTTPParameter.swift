@@ -24,53 +24,13 @@
 
 import Foundation
 
-public protocol URLScheme {
+public enum URLParameter {
     
-    var scheme : String {get}
-    var host : String {get}
-    var port : Int? {get}
-    var path : String? {get}
+    case parameter(String,String)
     
-    //static func &(me: Self, path: String) -> Self
-    //static func /(me: Self, params: [URLParameter]) -> Self
-    
-    
-    init(host: String, port: Int?, path: String?)
-}
-
-precedencegroup SchemePrecedence {
-    associativity: left
-    higherThan: MultiplicationPrecedence
-}
-
-infix operator ⁄ : SchemePrecedence
-
-
-public struct HTTP : HTTPScheme {
-
-    public let scheme: String = "http"
-    public let host: String
-    public let port: Int?
-    public let path: String?
-    
-    public init(host: String, port: Int? = nil, path: String? = nil){
-        self.host = host
-        self.port = port
-        self.path = path
+    var query : URLQueryItem {
+        switch self {
+        case .parameter(let p, let q): return URLQueryItem(name: p, value: q)
+        }
     }
 }
-
-public struct HTTPS : HTTPScheme {
-    
-    public let scheme: String = "https"
-    public let host: String
-    public let port: Int?
-    public let path: String?
-
-    public init(host: String, port: Int? = nil, path: String? = nil){
-        self.host = host
-        self.port = port
-        self.path = path
-    }
-}
-

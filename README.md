@@ -11,15 +11,15 @@
 </a>
 </p>
 
-A Swift library to build REST client applications 
+A Swift library to quickly build REST client apps. 
 
 ## Description
 
-Since REST is so common these days, implementing REST interfaces in [Swift](https://swift.org)  requires a lot of boilderplate code. This library provides a extremely straightforward approach to implement those quick and sometimes even dirty ;)
+Even with REST being extremely common these days, implementing REST interfaces in [Swift](https://swift.org)  requires a lot of boilderplate code. This library provides a extremely straightforward approach to implement REST intefaces quick and easy. It offers nice and clean syntax which wraps around the standard `URLRequest` and `JSONEncoder` / `JSONDecoder` implementations.
 
 ## Getting started
 
-### Package Manager
+### Swift Package Manager
 
 With the swift package manager, add the library to your dependencies
 ```swift
@@ -43,35 +43,47 @@ To check if a `GET` to  `http://domain.tld/api/version` returns a `200 OK`, it n
 ```swift
 
 // crate request by extending the base URL
-GET(url: HTTP(host: "domain.tld", path: "/api")⁄"version", expectedStatus: [.OK]).send { error in
-    // error == nil if Server returned 200 OK
-    if error != nil { print("Server did not return 200 OK") }
-}
+HTTPS(host: "images-api.nasa.gov")
+    .GET("/search")
+    .query(.parameter("q", searchTerm))
+    .send(.OK) { (result : JSONResponse) in
+        self.results = result.collection.items
+    }
 ```
 
-### GET / POST / PUT
+### GET / POST / PUT / DELETE
 
 ```swift
 
 let baseURL = HTTP(host: "domain.tld", path: "/api")
 
-GET(url: baseURL⁄"ENDPOINT", headers: [.UserAgent("Restify")], expectedStatus: [.OK]).send { output, error in
-    if output == "Pong" { print("Allright!") }
-    if let error = error { print(error) }
-}
+baseURL.GET("/Endpoint")
+    .header(.UserAgent("Restify"))
+    .send(.OK) { (response : JSONResponse ) in
+        // process response
+    }
 
-POST(url: baseURL⁄"ENDPOINT", headers: [.UserAgent("Restify")], body: "Ping", expectedStatus: [.OK]).send { output, error in
-    if output == "Pong" { print("Allright!") }
-    if let error = error { print(error) }
-}
+baseURL.POST("/Endpoint")
+    .header(.UserAgent("Restify"))
+    .query(.parameter("id", myID))
+    .body("Hello World")
+    .send(.Accepted) { (response : JSONResponse ) in
+        // process response
+    }
 
-PUT(url: baseURL⁄"ENDPOINT", headers: [.UserAgent("Restify")], body: "MyData", expectedStatus: [.OK]).send { error in
-    if let error = error {print(error)}
-}
+baseURL.PUT("/Endpoint")
+    .header(.UserAgent("Restify"))
+    .query(.parameter("id", myID))
+    .send(.Created) { (response : JSONResponse ) in
+        // process response
+    }
 
-DELETE(url: baseURL⁄"ENDPOINT"⁄"myID", headers: [.UserAgent("Restify")], expectedStatus: [.OK]).send { error in
-    if let error = error {print(error)}
-}
+baseURL.DELTE("/Endpoint")
+    .header(.UserAgent("Restify"))
+    .query(.parameter("id", myID))
+    .send(.OK) { (response : JSONResponse ) in
+        // process response
+    }
 ```
 
 ###  Authentication

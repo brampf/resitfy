@@ -21,7 +21,7 @@
  SOFTWARE.
  
  */
-
+import Logging
 import Foundation
 
 public typealias CodableCustomStringConvertible = Codable & CustomStringConvertible
@@ -32,4 +32,6 @@ public struct Restify {
     public static var errorDecoder : ((Data) -> CodableCustomStringConvertible?)?
     
     public static var sessionDelegeate : URLSessionDelegate?
+    
+    public static var log : Logger?
 }
