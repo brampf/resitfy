@@ -1,5 +1,5 @@
 <p align="center">
-<img src = "Doc/RestifyBanner@0.5x.png" alt="FitsCore">
+<img src = "DOC/RestifyBanner@0.5x.png" alt="FitsCore">
 </p>
 
 <p align="center">
